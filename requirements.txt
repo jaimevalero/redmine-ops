@@ -1,0 +1,3 @@
+python-redmine
+# for loading .env
+python-dotenv
