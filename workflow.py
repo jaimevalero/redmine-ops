@@ -6,7 +6,7 @@ from redminelib import Redmine
 import os
 from typing import List,Dict,Any,Literal,Optional
 import glob
-from pydantic import BaseModel, ValidationError
+from RedmineIssueModel import RedmineIssueModel
 
 REDMINE_URL = 'https://gmvmine-southpan.gmv.com/redmine-ad/'
 
@@ -21,57 +21,22 @@ def get_excel_files(directory: str) -> List[str]:
 def load_excel_into_dataframe(file_path: str) -> pd.DataFrame:
     """Load the first sheet of an Excel file into a pandas DataFrame."""
     return pd.read_excel(file_path)
-
-from pydantic import BaseModel, Field
-from typing import Literal
-
-class IssueModel(BaseModel):
-    Code: str = Field(alias="Code")
-    Subject: str = Field(alias="Subject")
-    Description: str = Field(alias="Description")
-    Status: Literal["Open", "Assigned", "Answered", "Closed", "Rejected", "Closed with Action", "Closed with No Action", "Implemented"] = Field(alias="Status")
-    Priority: str = Field(alias="Priority")
-    Target_version: str = Field(alias="Target version")
-    Originator_Company: str = Field(alias="Originator Company")
-    RID_Category: str = Field(alias="RID Category")
-    Problem_Location: str = Field(alias="Problem Location")
-    Recommended_Solution: str = Field(alias="Recommended Solution")
-    Parent_task: int = Field(alias="Parent task")
-    Assignee: str = Field(alias="Assignee")
-    Reply_from_the_Responsible: Optional[str] = Field(alias="Reply from the Responsible")
-    Action_to_implement: Optional[str] = Field(alias="Action to implement")    
-    Project: str = Field(alias="Project")
-    # Add more fields if necessary
-
+    
 def validate_dataframe(df: pd.DataFrame,redmine) -> bool:
     """Validate and process the DataFrame."""
     if df.empty:
         logger.error("The DataFrame is empty.")
         raise ValueError("The DataFrame has no data to process.")
-    # List all Redmine projects
-    redmine_projects = [ project.name for project in redmine.project.all()]
-    # Project columns has to be in the list of Redmine projects    
-    if "Project" not in df.columns:
-        logger.error("The DataFrame has no Project column.")
-        raise ValueError("The DataFrame has no Project column.")
-    # Check if all projects in the DataFrame are in Redmine
-    if not df["Project"].isin(redmine_projects).all():
-        logger.error("The DataFrame has invalid projects.")
-        raise ValueError("The DataFrame has invalid projects.")
-    
-
+    invalid_rows = 0
     for index, row in df.iterrows():
-        row_dict = row.to_dict()
-        row_dict = {k: v if pd.notna(v) else None for k, v in row_dict.items()}
+        row_dict = {k: v if pd.notna(v) else None for k, v in row.to_dict().items()}
         try:
-            issue = IssueModel(**row_dict)
-            # Process the issue here
+            issue = RedmineIssueModel(**row_dict, redmine=redmine)
         except ValidationError as e:
             logger.error(f"Invalid data in row {index}: {e}")
-            raise ValueError(f"Invalid data in row {index}")
-        
-    logger.info(f"All rows in the DataFrame are valid. Size is {df.shape}")
-    return True
+            invalid_rows += 1        
+    logger.info(f"Invalid rows: {invalid_rows} / {df.shape[0]}")
+    return invalid_rows
 
 def process_dataframe(df: pd.DataFrame, redmine: Redmine) -> Dict[int, Dict[str, Any]]:
     """Iterate over each row in the DataFrame and create a Redmine issue."""
@@ -82,7 +47,7 @@ def process_dataframe(df: pd.DataFrame, redmine: Redmine) -> Dict[int, Dict[str,
         row_dict = row.to_dict()
         row_dict = {k: v if pd.notna(v) else None for k, v in row_dict.items()}
         try:
-            issue = IssueModel(**row_dict)
+            issue = RedmineIssueModel(**row_dict)
             issue.Project = issue.Project.lower()
             redmine_project_id = redmine.project.get(issue.Project).id
         
@@ -113,9 +78,7 @@ def process_dataframe(df: pd.DataFrame, redmine: Redmine) -> Dict[int, Dict[str,
                     ] )
             if inserted_issue: 
                 inserted_issues.append(inserted_issue)
-                  
-                  
-                                
+                                               
             logger.info(f"Created issue {inserted_issue.id} in project {issue.Project}.")
         except ValidationError as e:
             logger.exception(f"Invalid data in row {index}: {e}")
@@ -146,8 +109,6 @@ def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     # If column Problem Location is empty, fill empty values with -
     if "Problem Location" in df.columns:
         df["Problem Location"].fillna("-", inplace=True)
-
-    
     
     return df
 
@@ -162,7 +123,7 @@ def process_files_redmine(excel_files, redmine_user: str, redmine_password: str)
             logger.info(f"Processing file {excel_file}")
             df = load_excel_into_dataframe(excel_file)
             df = preprocess_dataframe(df)
-            validate_dataframe(df,redmine)
+            invalid_rows = validate_dataframe(df,redmine)
             inserted_issues = process_dataframe(df, redmine)
             results = display_results(inserted_issues)
         except Exception as e:
@@ -190,11 +151,12 @@ def main():
             df = load_excel_into_dataframe(excel_file)
             df = preprocess_dataframe(df)
             validate_dataframe(df,redmine)
-            inserted_issues = process_dataframe(df, redmine)
+            #inserted_issues = process_dataframe(df, redmine)
             display_results(inserted_issues)
         except Exception as e:
             logger.exception(f"Error processing file {excel_file}: {str(e)}")
             pass
+        
 if __name__ == "__main__":
     main()
     
