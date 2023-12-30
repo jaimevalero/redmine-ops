@@ -1,3 +1,11 @@
 python-redmine
 # for loading .env
 python-dotenv
+loguru
+pandas
+
+openpyxl
+
+flask
+flask_bootstrap
+flask_wtf

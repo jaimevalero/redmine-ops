@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Upload Files</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        {{ form.username.label }}: {{ form.username() }}<br>
+        {{ form.password.label }}: {{ form.password() }}<br>
+        {{ form.files.label }}: {{ form.files(multiple=True) }}<br>
+        <input type="submit" value="Upload">
+    </form>
+{% endblock %}
