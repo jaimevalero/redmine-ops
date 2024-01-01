@@ -10,7 +10,7 @@ from werkzeug.datastructures import FileStorage
 import os
 from workflow import RedmineProcessor, process_files_redmine
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'  # replace with your secret key
+app.config['SECRET_KEY'] = 'my-secret-key-that-should-be-changed'  # replace with your secret key
 Bootstrap(app)
 
 class UploadForm(FlaskForm):
@@ -31,7 +31,10 @@ def upload_files():
 
         # process files
         try:
-            process_files(username, password, files)
+            with RedmineProcessor(username, password) as processor:
+                excel_files = process_files( files)
+                results = processor.process(excel_files)
+                
         except Exception as e:
             logger.exception(f"Error processing files: {str(e)}")
             return "Error processing files", 500
@@ -39,7 +42,7 @@ def upload_files():
 
     return render_template('index.html', form=form)
 
-def process_files(username: str, password: str, files: List[FileStorage]):
+def process_files(files: List[FileStorage]):
     """Process uploaded files."""
     file_paths = []
     for file in files:
@@ -55,10 +58,8 @@ def process_files(username: str, password: str, files: List[FileStorage]):
         except Exception as e:
             logger.exception(f"Error processing file {file.filename}: {str(e)}")
             pass
-    processor = RedmineProcessor(username, password)
-    results = processor(file_paths)
-            
-    return results        
+    return file_paths
+
 
 if __name__ == '__main__':
     app.run(debug=True)

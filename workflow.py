@@ -2,15 +2,13 @@ import pandas as pd
 
 from loguru import logger
 from dotenv import load_dotenv
-from redminelib import Redmine
 import os
 from typing import List,Dict,Any,Literal,Optional
 import glob
-
 from RedmineIssueModel import RedmineIssueModel
 from pydantic import  ValidationError
 
-REDMINE_URL = 'https://gmvmine-southpan.gmv.com/redmine-ad/'
+
 
 def get_excel_files(directory: str) -> List[str]:
     """Get all Excel files in the provided directory."""
@@ -27,6 +25,7 @@ def display_results(inserted_issues: List[Any]):
     for issue in inserted_issues:
         logger.info(f"Created issue {issue.id} in project {issue.project.name}.")
         
+
 
 def main():
     """Main function to process Excel files and create Redmine issues."""
