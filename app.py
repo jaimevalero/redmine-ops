@@ -8,7 +8,7 @@ from loguru import logger
 from typing import List
 from werkzeug.datastructures import FileStorage
 import os
-from workflow import process_files_redmine
+from workflow import RedmineProcessor, process_files_redmine
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'  # replace with your secret key
 Bootstrap(app)
@@ -35,7 +35,6 @@ def upload_files():
         except Exception as e:
             logger.exception(f"Error processing files: {str(e)}")
             return "Error processing files", 500
-
         return 'Files processed successfully', 200
 
     return render_template('index.html', form=form)
@@ -56,8 +55,10 @@ def process_files(username: str, password: str, files: List[FileStorage]):
         except Exception as e:
             logger.exception(f"Error processing file {file.filename}: {str(e)}")
             pass
-    resultados = process_files_redmine(file_paths, username, password)
-        
+    processor = RedmineProcessor(username, password)
+    results = processor(file_paths)
+            
+    return results        
 
 if __name__ == '__main__':
     app.run(debug=True)
