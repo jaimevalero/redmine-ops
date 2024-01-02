@@ -8,9 +8,11 @@ from loguru import logger
 from typing import List
 from werkzeug.datastructures import FileStorage
 import os
-from workflow import process_files_redmine
+
+from redmine_ops.RedmineProcessor import RedmineProcessor
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'  # replace with your secret key
+app.config['SECRET_KEY'] = 'my-secret-key-that-should-be-changed'  # replace with your secret key
 Bootstrap(app)
 
 class UploadForm(FlaskForm):
@@ -31,16 +33,22 @@ def upload_files():
 
         # process files
         try:
-            process_files(username, password, files)
+            with RedmineProcessor(username, password) as processor:
+                excel_files = process_files( files)
+                results = processor(excel_files)
+                
         except Exception as e:
             logger.exception(f"Error processing files: {str(e)}")
             return "Error processing files", 500
-
-        return 'Files processed successfully', 200
-
+        # render results template
+        return render_template('results.html', results=results)
+        
+        
+        
+        
     return render_template('index.html', form=form)
 
-def process_files(username: str, password: str, files: List[FileStorage]):
+def process_files(files: List[FileStorage]):
     """Process uploaded files."""
     file_paths = []
     for file in files:
@@ -48,16 +56,15 @@ def process_files(username: str, password: str, files: List[FileStorage]):
         try : 
             logger.info(f"Processing file {file.filename}")
             filename = secure_filename(file.filename)
-            # delete if exists f"tmp-{filename}"
-            if os.path.exists(f"tmp-{filename}"):
-                os.remove(f"tmp-{filename}")
-            file.save(os.path.join('./', f"tmp-{filename}"))
-            file_paths.append(f"tmp-{filename}")
+            if os.path.exists(f"tmptmp-{filename}"):
+                os.remove(f"tmptmp-{filename}")
+            file.save(os.path.join('./', f"tmptmp-{filename}"))
+            file_paths.append(f"tmptmp-{filename}")
         except Exception as e:
             logger.exception(f"Error processing file {file.filename}: {str(e)}")
             pass
-    resultados = process_files_redmine(file_paths, username, password)
-        
+    return file_paths
+
 
 if __name__ == '__main__':
     app.run(debug=True)

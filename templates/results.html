@@ -1,0 +1,26 @@
+{% block content %}
+    <h1>Results</h1>
+
+
+    {% if results is not none %}
+        <p>{{ results|length }} rows have been created.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Project</th>
+                    <th>Subject</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>   
+                        <td><a href="https://gmvmine-southpan.gmv.com/redmine-ad/issues/{{ result.id }}">{{ result.id }}</a></td>
+                        <td>{{ result.project }}</td>
+                        <td>{{ result.subject }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
