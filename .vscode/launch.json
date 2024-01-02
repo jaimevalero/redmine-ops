@@ -1,0 +1,44 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+ 
+
+        {
+            "name": "Python: workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "workflow.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Redmine_helpers",
+            "type": "python",
+            "request": "launch",
+            "program": "redmine_helpers.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        // Add flask
+        {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "app.py",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+    ]
+}

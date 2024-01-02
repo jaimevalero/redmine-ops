@@ -7,7 +7,8 @@ from redminelib import Redmine
 import os
 from typing import List,Dict,Any,Literal,Optional
 import glob
-from RedmineIssueModel import RedmineIssueModel
+from redmine_ops.RedmineIssueModel import RedmineIssueModel
+
 from pydantic import  ValidationError
 
 class RedmineProcessor:
@@ -50,23 +51,39 @@ class RedmineProcessor:
             df["Problem Location"].fillna("-", inplace=True)
         
         return df
+
+    def load_excel_into_dataframe(self,file_path: str) -> pd.DataFrame:
+        """Load the first sheet of an Excel file into a pandas DataFrame."""
+        return pd.read_excel(file_path)
         
     def process_files_redmine(self, excel_files):
         """Process a list of Excel files."""
-        results = None
+        inserted_issues = None
         for excel_file in excel_files:
             try:
                 logger.info(f"Processing file {excel_file}")
-                df = load_excel_into_dataframe(excel_file)
+                df = self.load_excel_into_dataframe(excel_file)
                 df = self.preprocess_dataframe(df)
                 invalid_rows = self.validate_dataframe(df, self.redmine)
                 inserted_issues = self.process_dataframe(df, self.redmine)
-                results = display_results(inserted_issues)
+                formatted_results = self.display_results(inserted_issues)
             except Exception as e:
                 logger.exception(f"Error processing file {excel_file}: {str(e)}")
                 pass
-        return results
-
+        return formatted_results
+    
+    def display_results(self,inserted_issues: List[Any]):
+        """Display the results."""
+        results = []
+        for issue in inserted_issues:
+            results.append({
+                    "id": issue.id, 
+                    "project": issue.project.name,
+                    "subject": issue.subject,
+                    })
+            logger.info(f"Created issue {issue.id} in project {issue.project.name}.")
+        return results            
+        
     def validate_dataframe(self,df: pd.DataFrame,redmine) -> bool:
         """Validate and process the DataFrame."""
         if df.empty:
@@ -85,7 +102,8 @@ class RedmineProcessor:
 
     def __call__(self, excel_files):
         """Make the class callable to hide implementation details."""
-        return self.process_files_redmine(excel_files)
+        results = self.process_files_redmine(excel_files) 
+        return results
  
     def __enter__(self):
         # Preparar el procesador (por ejemplo, conectar con la API de Redmine)
@@ -93,8 +111,6 @@ class RedmineProcessor:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Limpiar los recursos (por ejemplo, cerrar la conexión con la API de Redmine)
-        redmine = self.redmine
-        redmine.close()
         pass   
 
 
@@ -107,7 +123,7 @@ class RedmineProcessor:
             row_dict = row.to_dict()
             row_dict = {k: v if pd.notna(v) else None for k, v in row_dict.items()}
             try:
-                issue = RedmineIssueModel(**row_dict)
+                issue = RedmineIssueModel(**row_dict, redmine=redmine)
                 issue.Project = issue.Project.lower()
                 redmine_project_id = redmine.project.get(issue.Project).id
             

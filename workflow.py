@@ -5,26 +5,21 @@ from dotenv import load_dotenv
 import os
 from typing import List,Dict,Any,Literal,Optional
 import glob
-from RedmineIssueModel import RedmineIssueModel
 from pydantic import  ValidationError
-
-
+from redmine_ops.RedmineProcessor import RedmineProcessor
 
 def get_excel_files(directory: str) -> List[str]:
     """Get all Excel files in the provided directory."""
     excel_files = glob.glob(f"{directory}/*.xlsx")
-    # Remove file that starts with ~
-    excel_files = [file for file in excel_files if not os.path.basename(file).startswith("~")]
-    
+
+    # remove that start with ~ or has "tmptmp" in the name
+    excel_files = [file for file in excel_files if not ("\\~") in file ] 
+    excel_files = [file for file in excel_files if not ("tmptmp") in file ]
     return excel_files
 
 
     
-def display_results(inserted_issues: List[Any]):
-    """Display the results."""
-    for issue in inserted_issues:
-        logger.info(f"Created issue {issue.id} in project {issue.project.name}.")
-        
+
 
 
 def main():
@@ -35,10 +30,10 @@ def main():
     redmine_user = os.getenv("REDMINE_USER")
     redmine_password = os.getenv("REDMINE_PASSWORD")
     excel_files = get_excel_files(directory)
-
-
-    processor = RedmineProcessor(redmine_user, redmine_password)
-    results = processor(excel_files)
+    results = []
+    with RedmineProcessor(redmine_user, redmine_password) as processor:
+        results = processor(excel_files)
+    a = 0
         
 if __name__ == "__main__":
     main()

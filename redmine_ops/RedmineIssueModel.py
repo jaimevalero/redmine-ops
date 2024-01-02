@@ -56,7 +56,7 @@ class RedmineIssueModel(BaseModel):
 
     @classmethod
     def validate_fixed_version_id_exists(self, v):
-        redmine = values.get("redmine")
+        redmine = v.get("redmine")
         fixed_version_id = v.get("Target_version")
         if fixed_version_id:
             try:
