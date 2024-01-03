@@ -33,7 +33,8 @@ def main():
     results = []
     with RedmineProcessor(redmine_user, redmine_password) as processor:
         results = processor(excel_files)
-    a = 0
+    logger.info(results)
+    logger.info("End!")
         
 if __name__ == "__main__":
     main()
