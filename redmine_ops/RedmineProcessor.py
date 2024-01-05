@@ -59,6 +59,7 @@ class RedmineProcessor:
     def process_files_redmine(self, excel_files):
         """Process a list of Excel files."""
         inserted_issues = None
+        formatted_results = []
         for excel_file in excel_files:
             try:
                 logger.info(f"Processing file {excel_file}")

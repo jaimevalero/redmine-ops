@@ -1,11 +1,18 @@
 python-redmine
-# for loading .env
 python-dotenv
 loguru
 pandas
-
 openpyxl
-
+pydantic
+# For the Flask
 flask
 flask_bootstrap
 flask_wtf
+# For the tkinter
+#sudo apt-get install python3-tk
+tk
+wtforms
+werkzeug
+# For the bundling
+pyinstaller
+
