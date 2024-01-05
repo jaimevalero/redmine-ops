@@ -29,8 +29,8 @@ To run this application, you need to have Python installed on your machine. Foll
 
 1. Clone the repository.
 2. Install the dependencies with `pip install -r requirements.txt`.
-3. Choose one of the followings methods to run the application.
-    - Execute the .exe file 
+3. Alternatively, choose one of the followings methods to run the application.
+    - Execute file in the `dist` folder.
     - Run the application with `python tkinter_app.py` command.
     - Raise the flask application with `python app.py` command and open the application in a browser.
     - Execute the headless application with `python redmine_helpers.py` command.
