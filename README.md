@@ -3,6 +3,27 @@ Redmine Ops is a Python module designed to import issues into Redmine from an Ex
 
 > ⚠️ **WARNING: Please note that this module is dependent on the custom fields in an specific Redmine instance, and therefore, it is not a general-purpose module.**
 
+## Architecture (for non-developers)
+
+Our module, known as redmine_ops is built around two main components: 
+
+ - RedmineProcessor
+ 
+ - RedmineIssueModel
+
+
+### RedmineProcessor
+
+
+
+Think of [`RedmineProcessor`](redmine_ops/RedmineProcessor.py) as the manager of the operation. It takes in Excel files, reads the data, and prepares it to be sent to Redmine, our issue tracking system. It's like a translator, converting the information from the Excel file into a format that Redmine can understand.
+
+### RedmineIssueModel
+
+On the other hand, [`RedmineIssueModel`](redmine_ops/RedmineIssueModel.py) is like the blueprint for each individual issue that we're going to create in Redmine. It ensures that all the necessary information for an issue is present and correctly formatted.
+
+
+
 ## Required Fields in Excel File
 The Excel file should contain the following fields, which correspond to the attributes of the Pydantic model:
 
@@ -25,30 +46,15 @@ The Excel file should contain the following fields, which correspond to the attr
 | `Project`               | The project the issue belongs to.                                           |
 
 
-## Architecture (for non-developers)
 
-Our module, known as redmine_ops is built around two main components: 
-
- - RedmineProcessor
- 
- - RedmineIssueModel
-
-
-### RedmineProcessor
-
-
-
-Think of [`RedmineProcessor`](redmine_ops/RedmineProcessor.py) as the manager of the operation. It takes in Excel files, reads the data, and prepares it to be sent to Redmine, our issue tracking system. It's like a translator, converting the information from the Excel file into a format that Redmine can understand.
-
-### RedmineIssueModel
-
-On the other hand, [`RedmineIssueModel`](redmine_ops/RedmineIssueModel.py) is like the blueprint for each individual issue that we're going to create in Redmine. It ensures that all the necessary information for an issue is present and correctly formatted.
-## Running the Application
-To run this application, you need to have Python installed on your machine. Follow these steps:
+## Installing the app
+To install this application, you need to have Python installed on your machine. Follow these steps:
 
 1. Clone the repository.
 2. Install the dependencies with `pip install -r requirements.txt`.
-3. Alternatively, choose one of the followings methods to run the application.
+
+## Running the app
+You can choose one of the followings methods to run the application.
     - Execute file in the `dist` folder.
     - Run the application with `python tkinter_app.py` command.
     - Raise the flask application with `python app.py` command and open the application in a browser.
