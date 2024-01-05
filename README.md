@@ -27,17 +27,22 @@ The Excel file should contain the following fields, which correspond to the attr
 
 ## Architecture
 
-Our module, known as redmine_ops), is built around two main components: [`RedmineProcessor`](redmine_ops/RedmineProcessor.py) and [`RedmineIssueModel`](<redmine_ops/RedmineIssueModel.py>).
+Our module, known as redmine_ops is built around two main components: 
+
+ - RedmineProcessor
+ 
+ - RedmineIssueModel
+
 
 ### RedmineProcessor
 
-Think of [`RedmineProcessor`](<ruta_al_archivo_RedmineProcessor.py>) as the manager of the operation. It takes in Excel files, reads the data, and prepares it to be sent to Redmine, our issue tracking system. It's like a translator, converting the information from the Excel file into a format that Redmine can understand.
+
+
+Think of [`RedmineProcessor`](redmine_ops/RedmineProcessor.py) as the manager of the operation. It takes in Excel files, reads the data, and prepares it to be sent to Redmine, our issue tracking system. It's like a translator, converting the information from the Excel file into a format that Redmine can understand.
 
 ### RedmineIssueModel
 
-On the other hand, [`RedmineIssueModel`](<ruta_al_archivo_RedmineIssueModel.py>) is like the blueprint for each individual issue that we're going to create in Redmine. It ensures that all the necessary information for an issue is present and correctly formatted.
-
-
+On the other hand, [`RedmineIssueModel`](redmine_ops/RedmineIssueModel.py) is like the blueprint for each individual issue that we're going to create in Redmine. It ensures that all the necessary information for an issue is present and correctly formatted.
 ## Running the Application
 To run this application, you need to have Python installed on your machine. Follow these steps:
 
