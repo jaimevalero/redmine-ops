@@ -25,7 +25,7 @@ The Excel file should contain the following fields, which correspond to the attr
 | `Project`               | The project the issue belongs to.                                           |
 
 
-## Architecture
+## Architecture (for non-developers)
 
 Our module, known as redmine_ops is built around two main components: 
 
